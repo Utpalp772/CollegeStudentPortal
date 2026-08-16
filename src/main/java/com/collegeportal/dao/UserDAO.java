@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import com.collegeportal.model.User;
 import com.collegeportal.util.DBConnectionUtil;
@@ -27,14 +28,14 @@ public class UserDAO {
         }
     }
 
-    // Register a new user
-    public void registerUser(User user) throws SQLException {
+    // Register a new user, returns the generated user_id
+    public int registerUser(User user) throws SQLException {
 
         String sql = "INSERT INTO users (username, email, password_hash, role) "
                    + "VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
@@ -42,7 +43,17 @@ public class UserDAO {
             ps.setString(4, user.getRole());
 
             ps.executeUpdate();
+
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    int generatedId = keys.getInt(1);
+                    user.setUserId(generatedId);
+                    return generatedId;
+                }
+            }
         }
+
+        throw new SQLException("Creating user failed, no generated ID obtained.");
     }
 
     // Find user by username
@@ -58,9 +69,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
 
                 if (rs.next()) {
-
                     User user = new User();
-
                     user.setUserId(rs.getInt("user_id"));
                     user.setUsername(rs.getString("username"));
                     user.setEmail(rs.getString("email"));
@@ -103,9 +112,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
 
                 if (rs.next()) {
-
                     User user = new User();
-
                     user.setUserId(rs.getInt("user_id"));
                     user.setUsername(rs.getString("username"));
                     user.setEmail(rs.getString("email"));
