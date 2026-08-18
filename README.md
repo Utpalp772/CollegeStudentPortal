@@ -81,7 +81,7 @@ src/main/webapp/
 
 ### 1. Clone and import
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Utpalp772/CollegeStudentPortal.git
 ```
 Import as an existing Maven project into Eclipse.
 
