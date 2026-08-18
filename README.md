@@ -124,7 +124,3 @@ Log out and back in for the role change to take effect in your session. From the
 - Delete and role-change actions require `POST`, not `GET`.
 
 ---
-
-## License
-
-Built as an academic capstone project. Add a license of your choice if publishing publicly.
