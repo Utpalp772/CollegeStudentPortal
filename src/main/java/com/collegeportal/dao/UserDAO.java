@@ -56,6 +56,21 @@ public class UserDAO {
         throw new SQLException("Creating user failed, no generated ID obtained.");
     }
 
+    // Update user's role
+    public void updateRole(int userId, String newRole) throws SQLException {
+
+        String sql = "UPDATE users SET role = ? WHERE user_id = ?";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newRole);
+            ps.setInt(2, userId);
+
+            ps.executeUpdate();
+        }
+    }
+
     // Find user by username
     public User findByUsername(String username) throws SQLException {
 

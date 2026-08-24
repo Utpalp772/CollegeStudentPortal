@@ -1,177 +1,212 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+%>
+
+<c:if test="${not empty sessionScope.userId}">
+    <c:redirect url="/dashboard.jsp" />
+</c:if>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Create Account — College Student Portal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Create Account — College Student Portal</title>
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet"
-  >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link
-    rel="stylesheet"
-    href="${pageContext.request.contextPath}/resources/css/auth.css"
-  >
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="${pageContext.request.contextPath}/resources/css/auth.css">
+
 </head>
 
 <body>
 
-  <div class="auth-page">
+    <div class="auth-page">
 
-    <div class="auth-card">
+        <div class="auth-card">
 
-      <!-- Left Brand Section -->
-      <div class="auth-brand">
+            <!-- Left Brand Section -->
+            <div class="auth-brand">
 
-        <div class="auth-seal">CSP</div>
+                <div class="auth-seal">
+                    CSP
+                </div>
 
-        <p class="eyebrow eyebrow--light">
-          New Registration
-        </p>
+                <p class="eyebrow eyebrow--light">
+                    New Registration
+                </p>
 
-        <h1>
-          College Student Portal
-        </h1>
+                <h1>
+                    College Student Portal
+                </h1>
 
-        <p class="auth-brand-tagline">
-          Set up access to your profile, records, and documents.
-        </p>
+                <p class="auth-brand-tagline">
+                    Set up access to your profile, records, and documents.
+                </p>
 
-        <div class="auth-ledger"></div>
+                <div class="auth-ledger"></div>
 
-      </div>
+            </div>
 
-      <div class="divider-seam" aria-hidden="true"></div>
+            <div class="divider-seam" aria-hidden="true"></div>
 
-      <!-- Registration Form Section -->
-      <div class="auth-form-panel">
+            <!-- Registration Form Section -->
+            <div class="auth-form-panel">
 
-        <p class="eyebrow">
-          Create Account
-        </p>
+                <p class="eyebrow">
+                    Create Account
+                </p>
 
-        <h2>
-          Join the portal
-        </h2>
+                <h2>
+                    Join the portal
+                </h2>
 
-        <p class="auth-subheading">
-          Register with your college email to get started.
-        </p>
+                <p class="auth-subheading">
+                    Register with your college email to get started.
+                </p>
 
-        <!-- Error Message -->
-        <c:if test="${not empty error}">
-          <div class="banner banner--error">
-            <c:out value="${error}" />
-          </div>
-        </c:if>
+                <!-- Error Message -->
+                <c:if test="${not empty error}">
+                    <div class="banner banner--error">
+                        <c:out value="${error}" />
+                    </div>
+                </c:if>
 
-        <!-- Registration Form -->
-        <form action="register" method="post">
+                <!-- Registration Form -->
+                <form
+                    action="${pageContext.request.contextPath}/register"
+                    method="post">
 
-          <!-- Full Name -->
-          <div class="field">
-            <label for="fullName">Full name</label>
+                    <!-- Full Name -->
+                    <div class="field">
 
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              value="${param.fullName}"
-              required
-            >
-          </div>
+                        <label for="fullName">
+                            Full name
+                        </label>
 
-          <!-- Username -->
-          <div class="field">
-            <label for="username">Username</label>
+                        <input
+                            type="text"
+                            id="fullName"
+                            name="fullName"
+                            value="${param.fullName}"
+                            required>
 
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value="${param.username}"
-              required
-              autocomplete="username"
-            >
-          </div>
+                    </div>
 
-          <!-- College Email -->
-          <div class="field">
-            <label for="email">College email</label>
+                    <!-- Username -->
+                    <div class="field">
 
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value="${param.email}"
-              required
-              autocomplete="email"
-            >
-          </div>
+                        <label for="username">
+                            Username
+                        </label>
 
-          <!-- Password -->
-          <div class="field">
-            <label for="password">Password</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            value="${param.username}"
+                            required
+                            autocomplete="username">
 
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              minlength="8"
-              autocomplete="new-password"
-            >
+                    </div>
 
-            <p class="hint">
-              At least 8 characters.
-            </p>
-          </div>
+                    <!-- College Email -->
+                    <div class="field">
 
-          <!-- Confirm Password -->
-          <div class="field">
-            <label for="confirmPassword">
-              Confirm password
-            </label>
+                        <label for="email">
+                            College email
+                        </label>
 
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              required
-              autocomplete="new-password"
-            >
-          </div>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value="${param.email}"
+                            required
+                            autocomplete="email">
 
-          <!-- Submit -->
-          <button
-            type="submit"
-            class="btn-primary"
-          >
-            Create account
-          </button>
+                    </div>
 
-        </form>
+                    <!-- Password -->
+                    <div class="field">
 
-        <!-- Login Link -->
-        <p class="auth-footer-link">
-          Already registered?
-          <a href="login.jsp">Sign in</a>
-        </p>
+                        <label for="password">
+                            Password
+                        </label>
 
-      </div>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            required
+                            minlength="8"
+                            autocomplete="new-password">
+
+                        <p class="hint">
+                            At least 8 characters.
+                        </p>
+
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="field">
+
+                        <label for="confirmPassword">
+                            Confirm password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            required
+                            autocomplete="new-password">
+
+                    </div>
+
+                    <!-- Submit -->
+                    <button
+                        type="submit"
+                        class="btn-primary">
+
+                        Create account
+
+                    </button>
+
+                </form>
+
+                <!-- Login Link -->
+                <p class="auth-footer-link">
+
+                    Already registered?
+
+                    <a href="${pageContext.request.contextPath}/login.jsp">
+                        Sign in
+                    </a>
+
+                </p>
+
+            </div>
+
+        </div>
 
     </div>
 
-  </div>
-
 </body>
+
 </html>

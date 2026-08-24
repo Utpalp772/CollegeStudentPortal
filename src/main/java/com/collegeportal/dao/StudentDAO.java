@@ -29,8 +29,6 @@ public class StudentDAO {
     // CREATE STUDENT PROFILE
     // ---------------------------------------------------------
 
-    // Called right after a new user registers.
-    // Creates a basic student profile with user_id, first_name, and last_name.
     public void createStudentProfile(int userId, String firstName, String lastName)
             throws SQLException {
 
@@ -52,10 +50,12 @@ public class StudentDAO {
     // FIND STUDENT BY USER ID
     // ---------------------------------------------------------
 
-    // Finds a student profile using the user's ID.
     public Student findByUserId(int userId) throws SQLException {
 
-        String sql = "SELECT * FROM students WHERE user_id = ?";
+        String sql = "SELECT s.*, u.role "
+                   + "FROM students s "
+                   + "JOIN users u ON s.user_id = u.user_id "
+                   + "WHERE s.user_id = ?";
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -77,11 +77,12 @@ public class StudentDAO {
     // FIND STUDENT BY STUDENT ID
     // ---------------------------------------------------------
 
-    // Finds a student using the student_id.
-    // Used by the admin edit/view/delete functionality.
     public Student findById(int studentId) throws SQLException {
 
-        String sql = "SELECT * FROM students WHERE student_id = ?";
+        String sql = "SELECT s.*, u.role "
+                   + "FROM students s "
+                   + "JOIN users u ON s.user_id = u.user_id "
+                   + "WHERE s.student_id = ?";
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -103,8 +104,6 @@ public class StudentDAO {
     // COUNT ALL STUDENTS
     // ---------------------------------------------------------
 
-    // Counts all students.
-    // Used to calculate the total number of pages.
     public int countAll() throws SQLException {
 
         String sql = "SELECT COUNT(*) FROM students";
@@ -123,8 +122,6 @@ public class StudentDAO {
     // COUNT SEARCH RESULTS
     // ---------------------------------------------------------
 
-    // Counts students matching the search keyword.
-    // Used to calculate the total number of search-result pages.
     public int countSearch(String keyword) throws SQLException {
 
         String sql = "SELECT COUNT(*) FROM students WHERE "
@@ -154,7 +151,6 @@ public class StudentDAO {
     // FIND ALL STUDENTS WITH SORTING + PAGINATION
     // ---------------------------------------------------------
 
-    // Finds students for a specific page with sorting.
     public List<Student> findAll(String sortBy, String sortDir, int page)
             throws SQLException {
 
@@ -167,8 +163,8 @@ public class StudentDAO {
 
         // Check for null before calling contains().
         String column = (sortBy != null && ALLOWED_SORT_COLUMNS.contains(sortBy))
-                ? sortBy
-                : "student_id";
+                ? "s." + sortBy
+                : "s.student_id";
 
         String direction = "desc".equalsIgnoreCase(sortDir)
                 ? "DESC"
@@ -176,8 +172,10 @@ public class StudentDAO {
 
         int offset = (page - 1) * PAGE_SIZE;
 
-        String sql = "SELECT * FROM students ORDER BY "
-                   + column + " " + direction
+        String sql = "SELECT s.*, u.role "
+                   + "FROM students s "
+                   + "JOIN users u ON s.user_id = u.user_id "
+                   + "ORDER BY " + column + " " + direction
                    + " LIMIT ? OFFSET ?";
 
         try (Connection conn = DBConnectionUtil.getConnection();
@@ -201,8 +199,6 @@ public class StudentDAO {
     // SEARCH STUDENTS WITH SORTING + PAGINATION
     // ---------------------------------------------------------
 
-    // Searches students by first name, last name, roll number,
-    // or department, with sorting and pagination.
     public List<Student> search(
             String keyword,
             String sortBy,
@@ -218,8 +214,8 @@ public class StudentDAO {
 
         // Check for null before calling contains().
         String column = (sortBy != null && ALLOWED_SORT_COLUMNS.contains(sortBy))
-                ? sortBy
-                : "student_id";
+                ? "s." + sortBy
+                : "s.student_id";
 
         String direction = "desc".equalsIgnoreCase(sortDir)
                 ? "DESC"
@@ -227,9 +223,13 @@ public class StudentDAO {
 
         int offset = (page - 1) * PAGE_SIZE;
 
-        String sql = "SELECT * FROM students WHERE "
-                   + "first_name LIKE ? OR last_name LIKE ? OR "
-                   + "roll_number LIKE ? OR department LIKE ? "
+        String sql = "SELECT s.*, u.role "
+                   + "FROM students s "
+                   + "JOIN users u ON s.user_id = u.user_id "
+                   + "WHERE s.first_name LIKE ? OR "
+                   + "s.last_name LIKE ? OR "
+                   + "s.roll_number LIKE ? OR "
+                   + "s.department LIKE ? "
                    + "ORDER BY " + column + " " + direction
                    + " LIMIT ? OFFSET ?";
 
@@ -292,6 +292,44 @@ public class StudentDAO {
     }
 
     // ---------------------------------------------------------
+    // UPDATE STUDENT PROFILE PHOTO
+    // ---------------------------------------------------------
+
+    // Updates only the profile photo filename.
+    public void updateProfilePhoto(int userId, String filename)
+            throws SQLException {
+
+        String sql = "UPDATE students SET profile_photo = ? WHERE user_id = ?";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, filename);
+            ps.setInt(2, userId);
+
+            ps.executeUpdate();
+        }
+    }
+
+    // ---------------------------------------------------------
+    // CLEAR STUDENT PROFILE PHOTO
+    // ---------------------------------------------------------
+
+    // Removes the profile photo reference from the database.
+    public void clearProfilePhoto(int userId) throws SQLException {
+
+        String sql = "UPDATE students SET profile_photo = NULL WHERE user_id = ?";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            ps.executeUpdate();
+        }
+    }
+
+    // ---------------------------------------------------------
     // ADMIN UPDATE STUDENT
     // ---------------------------------------------------------
 
@@ -331,7 +369,6 @@ public class StudentDAO {
     // DELETE STUDENT
     // ---------------------------------------------------------
 
-    // Deletes a student using student_id.
     public void deleteStudent(int studentId) throws SQLException {
 
         String sql = "DELETE FROM students WHERE student_id = ?";
@@ -349,7 +386,6 @@ public class StudentDAO {
     // MAP DATABASE ROW TO STUDENT OBJECT
     // ---------------------------------------------------------
 
-    // Converts a database row into a Student object.
     private Student mapRow(ResultSet rs) throws SQLException {
 
         Student s = new Student();
@@ -374,7 +410,12 @@ public class StudentDAO {
             s.setSemester(semester);
         }
 
+        // Profile photo filename.
         s.setProfilePhoto(rs.getString("profile_photo"));
+
+        // User role from users table.
+        s.setRole(rs.getString("role"));
+
         s.setUpdatedAt(rs.getTimestamp("updated_at"));
 
         return s;

@@ -14,8 +14,9 @@ public class Student {
     private String address;
     private String course;
     private String department;
-    private Integer semester;      // Integer, not int — must be able to represent "not set"
-    private String profilePhoto;   // stays unused until Phase 3
+    private Integer semester;
+    private String profilePhoto;
+    private String role;
     private Timestamp updatedAt;
 
     public int getStudentId() { return studentId; }
@@ -54,11 +55,12 @@ public class Student {
     public String getProfilePhoto() { return profilePhoto; }
     public void setProfilePhoto(String profilePhoto) { this.profilePhoto = profilePhoto; }
 
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
     public Timestamp getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
 
-    // Convenience method — used everywhere we just want "the name" without
-    // callers having to concatenate first/last themselves
     public String getFullName() {
         return firstName + " " + lastName;
     }
